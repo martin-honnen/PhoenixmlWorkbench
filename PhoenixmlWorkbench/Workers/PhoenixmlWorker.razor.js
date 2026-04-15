@@ -21,6 +21,7 @@ self.addEventListener('message', async e => {
         switch (e.data.command) {
             case 'transform':
                 result = await assemblyExports.PhoenixmlWorker.Transform(e.data.xslt, e.data.xml);
+                result = JSON.parse(result);
                 break;
             case 'executeXQuery':
                 result = await assemblyExports.PhoenixmlWorker.ExecuteXQuery(e.data.xquery, e.data.xml);
@@ -28,7 +29,7 @@ self.addEventListener('message', async e => {
             default:
                 throw new Error(`Unknown command: ${e.data.command}`);
         }
-        result = JSON.parse(result);
+        
         self.postMessage({
             command: 'response',
             requestId: e.data.requestId, result
