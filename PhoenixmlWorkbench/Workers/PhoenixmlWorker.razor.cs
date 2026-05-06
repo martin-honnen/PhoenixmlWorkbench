@@ -8,10 +8,12 @@ using System.Text.Json;
 public partial class PhoenixmlWorker
 {
     [JSExport]
-    public static async Task<string> Transform(string xslt, string xml)
+    public static async Task<string> Transform(string xslt, string xml, string codeBaseURI, string inputBaseURI)
     {
         var transformer = new XsltTransformer();
-        await transformer.LoadStylesheetAsync(xslt, new Uri("urn:from-string"));
+        await transformer.LoadStylesheetAsync(xslt, new Uri(codeBaseURI));
+
+        transformer.SetSourceDocumentUri(new Uri(inputBaseURI));
         var primaryResult = await transformer.TransformAsync(xml);
 
         var results = new Dictionary<string, string>();
