@@ -12,11 +12,27 @@ public partial class PhoenixmlWorker
     static string? transpilerCode = null;
     static string? _baseUrl = null;
 
+    static string[] docbookFilesToBePreloaded = new string[] { 
+            "/examples/xslt/docbook/xslt/modules/templates.xml",
+            "/examples/xslt/docbook/xslt/transforms/00-logstruct.xsl",
+            "/examples/xslt/docbook/xslt/transforms/50-normalize.xsl",
+            "/examples/xslt/docbook/xslt/transforms/52-calstables.xsl",
+            "/examples/xslt/docbook/xslt/transforms/70-xlinkbase.xsl",
+            "/examples/xslt/docbook/xslt/locale/en.xml",
+            "/examples/xslt/docbook/xslt/environment.xsl"
+    };
+
+    static PreloadedResources preloadedResources = new PreloadedResources();
+
     [JSExport]
     public static void Initialize(string baseUrl)
     {
         _baseUrl = baseUrl.TrimEnd('/');
     }
+
+    static bool docbookCompiled = false;
+
+    static XsltTransformer docbookTransformer = new XsltTransformer();
 
     private static Uri ToAbsoluteUri(string relativeOrAbsolute)
     {
@@ -43,10 +59,54 @@ public partial class PhoenixmlWorker
     public static async Task<string> Transform(string xslt, string xml, string codeBaseURI, string inputBaseURI)
     {
         var transformer = new XsltTransformer();
-        //transformer.PreloadedResources
+
         await transformer.LoadStylesheetAsync(xslt, new Uri(codeBaseURI));
 
         transformer.SetSourceDocumentUri(new Uri(inputBaseURI));
+
+        var primaryResult = await transformer.TransformAsync(xml);
+
+        var results = new Dictionary<string, string>();
+        results.Add("*** principal result ***", primaryResult);
+
+        foreach (var secondaryResult in transformer.SecondaryResultDocuments)
+        {
+            results.Add(secondaryResult.Key, secondaryResult.Value);
+        }
+
+        return JsonSerializer.Serialize(results);
+    }
+
+    [JSExport]
+    public static async Task<string> Docbook(string xslt, string xml, string codeBaseURI, string inputBaseURI)
+    {
+        var transformer = docbookTransformer;
+
+        if (!docbookCompiled)
+        {
+
+            using var http = new HttpClient();
+
+            transformer.PreloadedResources = preloadedResources;
+
+            foreach (var docbookFile in docbookFilesToBePreloaded)
+            {
+                var absoluteUri = ToAbsoluteUri(docbookFile);
+
+                if (!transformer.PreloadedResources.Contains(absoluteUri))
+                {
+                    var content = await http.GetStringAsync(absoluteUri);
+                    transformer.PreloadedResources.Add(absoluteUri, content);
+                }
+            }
+
+            await transformer.LoadStylesheetAsync(xslt, new Uri(codeBaseURI));
+
+            docbookCompiled = true;
+        }
+
+        transformer.SetSourceDocumentUri(new Uri(inputBaseURI));
+
         var primaryResult = await transformer.TransformAsync(xml);
 
         var results = new Dictionary<string, string>();

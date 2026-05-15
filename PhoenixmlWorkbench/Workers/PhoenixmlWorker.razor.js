@@ -24,6 +24,10 @@ self.addEventListener('message', async e => {
                 result = await assemblyExports.PhoenixmlWorker.Transform(e.data.xslt, e.data.xml, e.data.codeBaseURI, e.data.inputBaseURI);
                 result = JSON.parse(result);
                 break;
+            case 'docbook':
+                result = await assemblyExports.PhoenixmlWorker.Docbook(e.data.xslt, e.data.xml, e.data.codeBaseURI, e.data.inputBaseURI);
+                result = JSON.parse(result);
+                break;
             case 'executeXQuery':
                 result = await assemblyExports.PhoenixmlWorker.ExecuteXQuery(e.data.xquery, e.data.xml);
                 break;
