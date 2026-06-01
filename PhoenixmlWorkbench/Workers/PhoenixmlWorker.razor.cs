@@ -15,6 +15,7 @@ public partial class PhoenixmlWorker
     static string[] docbookFilesToBePreloaded = new string[] { 
             "/examples/xslt/docbook/xslt/modules/templates.xml",
             "/examples/xslt/docbook/xslt/transforms/00-logstruct.xsl",
+            "/examples/xslt/docbook/xslt/transforms/20-db4to5.xsl",
             "/examples/xslt/docbook/xslt/transforms/50-normalize.xsl",
             "/examples/xslt/docbook/xslt/transforms/52-calstables.xsl",
             "/examples/xslt/docbook/xslt/transforms/70-xlinkbase.xsl",
