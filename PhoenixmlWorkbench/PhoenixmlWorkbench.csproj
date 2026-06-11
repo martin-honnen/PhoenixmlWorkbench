@@ -14,8 +14,8 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.8" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.0.8" PrivateAssets="all" />
-    <PackageReference Include="PhoenixmlDb.XQuery" Version="1.4.1" />
-    <PackageReference Include="PhoenixmlDb.Xslt" Version="1.4.1" />
+    <PackageReference Include="PhoenixmlDb.XQuery" Version="1.4.3" />
+    <PackageReference Include="PhoenixmlDb.Xslt" Version="1.4.5" />
   </ItemGroup>
 
   <ItemGroup>
